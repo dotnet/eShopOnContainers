@@ -15,7 +15,7 @@ namespace eShopOnContainers.Core.ViewModels
         private CatalogBrand _brand;
         private ObservableCollection<CatalogType> _types;
         private CatalogType _type;
-        private ICatalogService _productsService;
+        private readonly ICatalogService _productsService;
 
         public CatalogViewModel(ICatalogService productsService)
         {

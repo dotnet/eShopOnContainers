@@ -22,9 +22,9 @@ namespace eShopOnContainers.Core.ViewModels
         private bool _isLogin;
         private string _authUrl;
 
-        private ISettingsService _settingsService;
-        private IOpenUrlService _openUrlService;
-        private IIdentityService _identityService;
+        private readonly ISettingsService _settingsService;
+        private readonly IOpenUrlService _openUrlService;
+        private readonly IIdentityService _identityService;
 
         public LoginViewModel(
             ISettingsService settingsService,

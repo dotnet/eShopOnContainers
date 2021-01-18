@@ -22,10 +22,10 @@ namespace eShopOnContainers.Core.ViewModels
         private Order _order;
         private Address _shippingAddress;
 
-        private ISettingsService _settingsService;
-        private IBasketService _basketService;
-        private IOrderService _orderService;
-        private IUserService _userService;
+        private readonly ISettingsService _settingsService;
+        private readonly IBasketService _basketService;
+        private readonly IOrderService _orderService;
+        private readonly IUserService _userService;
 
         public CheckoutViewModel(
             ISettingsService settingsService,

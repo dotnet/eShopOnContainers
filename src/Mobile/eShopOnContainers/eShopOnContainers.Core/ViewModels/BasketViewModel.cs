@@ -18,9 +18,9 @@ namespace eShopOnContainers.Core.ViewModels
         private ObservableCollection<BasketItem> _basketItems;
         private decimal _total;
 
-        private ISettingsService _settingsService;
-        private IBasketService _basketService;
-        private IUserService _userService;
+        private readonly ISettingsService _settingsService;
+        private readonly IBasketService _basketService;
+        private readonly IUserService _userService;
 
         public BasketViewModel(
             ISettingsService settingsService,
