@@ -19,7 +19,6 @@ namespace eShopOnContainers.Droid.Renderers
 {
     public class CustomTabbedPageRenderer : TabbedPageRenderer
     {
-        private const int DelayBeforeTabAdded = 10;
         protected readonly Dictionary<Element, BadgeView> BadgeViews = new Dictionary<Element, BadgeView>();
         private TabLayout _tabLayout;
         private LinearLayout _tabStrip;
@@ -186,10 +185,8 @@ namespace eShopOnContainers.Droid.Renderers
             BadgeViews.Remove(e.Element);
         }
 
-        private async void OnTabAdded(object sender, ElementEventArgs e)
+        private void OnTabAdded(object sender, ElementEventArgs e)
         {
-            await Task.Delay(DelayBeforeTabAdded);
-
             var page = e.Element as Page;
 
             if (page == null)

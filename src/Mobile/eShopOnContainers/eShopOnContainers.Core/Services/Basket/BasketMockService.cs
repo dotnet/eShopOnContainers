@@ -18,52 +18,48 @@ namespace eShopOnContainers.Core.Services.Basket
                 }
         };
 
-        public async Task<CustomerBasket> GetBasketAsync(string guidUser, string token)
+        public Task<CustomerBasket> GetBasketAsync(string guidUser, string token)
         {
-            await Task.Delay(10);
-
             if (string.IsNullOrEmpty(guidUser) || string.IsNullOrEmpty(token))
             {
-                return new CustomerBasket();
+                return Task.FromResult(new CustomerBasket());
             }
 
-            return MockCustomBasket;
+            return Task.FromResult(MockCustomBasket);
         }
 
-        public async Task<CustomerBasket> UpdateBasketAsync(CustomerBasket customerBasket, string token)
+        public Task<CustomerBasket> UpdateBasketAsync(CustomerBasket customerBasket, string token)
         {
-            await Task.Delay(10);
-
             if (string.IsNullOrEmpty(token))
             {
-                return new CustomerBasket();
+                return Task.FromResult(new CustomerBasket());
             }
 
             MockCustomBasket = customerBasket;
 
-            return MockCustomBasket;
+            return Task.FromResult(MockCustomBasket);
         }
 
-        public async Task ClearBasketAsync(string guidUser, string token)
+        public Task ClearBasketAsync(string guidUser, string token)
         {
-            await Task.Delay(10);
-
             if (string.IsNullOrEmpty(token))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             if (!string.IsNullOrEmpty(guidUser))
             {
                 MockCustomBasket.Items.Clear();
             }
+
+            return Task.CompletedTask;
         }
 
         public Task CheckoutAsync(BasketCheckout basketCheckout, string token)
         {
             if (string.IsNullOrEmpty(token))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             if (basketCheckout != null)
@@ -71,7 +67,7 @@ namespace eShopOnContainers.Core.Services.Basket
                 MockCustomBasket.Items.Clear();
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

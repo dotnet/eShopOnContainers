@@ -74,10 +74,8 @@ namespace eShopOnContainers.iOS.Renderers
             }
         }
 
-        private async void OnTabAdded(object sender, ElementEventArgs e)
+        private void OnTabAdded(object sender, ElementEventArgs e)
         {
-            await Task.Delay(10);
-
             var page = e.Element as Page;
             if (page == null)
                 return;

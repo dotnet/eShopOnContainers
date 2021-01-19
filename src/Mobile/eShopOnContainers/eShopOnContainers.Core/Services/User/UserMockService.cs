@@ -26,10 +26,9 @@ namespace eShopOnContainers.Core.Services.User
             CardSecurityNumber = "1234"
         };
 
-        public async Task<UserInfo> GetUserInfoAsync(string authToken)
+        public Task<UserInfo> GetUserInfoAsync(string authToken)
         {
-            await Task.Delay(10);
-            return MockUserInfo;
+            return Task.FromResult(MockUserInfo);
         }
     }
 }

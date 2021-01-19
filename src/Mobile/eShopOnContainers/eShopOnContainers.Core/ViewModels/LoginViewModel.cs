@@ -160,8 +160,6 @@ namespace eShopOnContainers.Core.ViewModels
             {
                 try
                 {
-                    await Task.Delay(10);
-
                     isAuthenticated = true;
                 }
                 catch (Exception ex)
@@ -185,17 +183,17 @@ namespace eShopOnContainers.Core.ViewModels
             IsBusy = false;
         }
 
-        private async Task SignInAsync()
+        private Task SignInAsync()
         {
             IsBusy = true;
-
-            await Task.Delay(10);
 
             LoginUrl = _identityService.CreateAuthorizationRequest();
 
             IsValid = true;
             IsLogin = true;
             IsBusy = false;
+
+            return Task.CompletedTask;
         }
 
         private void Register()

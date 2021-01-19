@@ -36,16 +36,14 @@ namespace eShopOnContainers.Core.Services.Marketing
             }
         };
 
-        public async Task<ObservableCollection<CampaignItem>> GetAllCampaignsAsync(string token)
+        public Task<ObservableCollection<CampaignItem>> GetAllCampaignsAsync(string token)
         {
-            await Task.Delay(10);
-            return _mockCampaign;
+            return Task.FromResult(_mockCampaign);
         }
 
-        public async Task<CampaignItem> GetCampaignByIdAsync(int campaignId, string token)
+        public Task<CampaignItem> GetCampaignByIdAsync(int campaignId, string token)
         {
-            await Task.Delay(10);
-            return _mockCampaign.SingleOrDefault(c => c.Id == campaignId);
+            return Task.FromResult(_mockCampaign.SingleOrDefault(c => c.Id == campaignId));
         }
     }
 }

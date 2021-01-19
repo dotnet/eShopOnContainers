@@ -31,35 +31,27 @@ namespace eShopOnContainers.Core.Services.Catalog
             new CatalogItem { Id = Common.Common.MockCatalogItemId05, PictureUri = Device.RuntimePlatform != Device.UWP ? "fake_product_05.png" : "Assets/fake_product_05.png", Name = "Azure Black Sweatshirt (M)", Price = 19.50M, CatalogBrandId = 1, CatalogBrand = "Azure", CatalogTypeId = 2, CatalogType = "T-Shirt" }
         };
 
-        public async Task<ObservableCollection<CatalogItem>> GetCatalogAsync()
+        public Task<ObservableCollection<CatalogItem>> GetCatalogAsync()
         {
-            await Task.Delay(10);
-
-            return MockCatalog;
+            return Task.FromResult(MockCatalog);
         }
 
-        public async Task<ObservableCollection<CatalogItem>> FilterAsync(int catalogBrandId, int catalogTypeId)
+        public Task<ObservableCollection<CatalogItem>> FilterAsync(int catalogBrandId, int catalogTypeId)
         {
-            await Task.Delay(10);
-
-            return MockCatalog
+            return Task.FromResult(MockCatalog
                 .Where(c => c.CatalogBrandId == catalogBrandId &&
                 c.CatalogTypeId == catalogTypeId)
-                .ToObservableCollection();
+                .ToObservableCollection());
         }
 
-        public async Task<ObservableCollection<CatalogBrand>> GetCatalogBrandAsync()
+        public Task<ObservableCollection<CatalogBrand>> GetCatalogBrandAsync()
         {
-            await Task.Delay(10);
-
-            return MockCatalogBrand;
+            return Task.FromResult(MockCatalogBrand);
         }
 
-        public async Task<ObservableCollection<CatalogType>> GetCatalogTypeAsync()
-        {
-            await Task.Delay(10);
-
-            return MockCatalogType;
+        public Task<ObservableCollection<CatalogType>> GetCatalogTypeAsync()
+        { 
+            return Task.FromResult(MockCatalogType);
         }
     }
 }

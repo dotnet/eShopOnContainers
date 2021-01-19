@@ -64,7 +64,6 @@ namespace eShopOnContainers.Windows.Services
                 var status = _locator.LocationStatus;
                 while (status == PositionStatus.Initializing)
                 {
-                    Task.Delay(10).Wait();
                     status = _locator.LocationStatus;
                 }
                 return status != PositionStatus.NotAvailable;
@@ -78,7 +77,6 @@ namespace eShopOnContainers.Windows.Services
                 var status = _locator.LocationStatus;
                 while (status == PositionStatus.Initializing)
                 {
-                    Task.Delay(10).Wait();
                     status = _locator.LocationStatus;
                 }
                 return status != PositionStatus.Disabled && status != PositionStatus.NotAvailable;

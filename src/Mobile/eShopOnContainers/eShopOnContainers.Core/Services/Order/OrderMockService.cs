@@ -72,39 +72,35 @@ namespace eShopOnContainers.Core.Services.Order
             Street = "FakeStreet"
         };
 
-        public async Task<ObservableCollection<Models.Orders.Order>> GetOrdersAsync(string token)
+        public Task<ObservableCollection<Models.Orders.Order>> GetOrdersAsync(string token)
         {
-            await Task.Delay(10);
-
             if (!string.IsNullOrEmpty(token))
             {
-                return MockOrders
+                return Task.FromResult(MockOrders
                     .OrderByDescending(o => o.OrderNumber)
-                    .ToObservableCollection();
+                    .ToObservableCollection());
             }
             else
-                return new ObservableCollection<Models.Orders.Order>();
+                return Task.FromResult(new ObservableCollection<Models.Orders.Order>());
         }
 
-        public async Task<Models.Orders.Order> GetOrderAsync(int orderId, string token)
+        public Task<Models.Orders.Order> GetOrderAsync(int orderId, string token)
         {
-            await Task.Delay(10);
-
             if (!string.IsNullOrEmpty(token))
-                return MockOrders
-                    .FirstOrDefault(o => o.OrderNumber.Equals(orderId));
+                return Task.FromResult(MockOrders
+                    .FirstOrDefault(o => o.OrderNumber.Equals(orderId)));
             else
-                return new Models.Orders.Order();
+                return Task.FromResult(new Models.Orders.Order());
         }
 
-        public async Task CreateOrderAsync(Models.Orders.Order newOrder, string token)
+        public Task CreateOrderAsync(Models.Orders.Order newOrder, string token)
         {
-            await Task.Delay(10);
-
             if (!string.IsNullOrEmpty(token))
             {
                 MockOrders.Add(newOrder);
             }
+
+            return Task.CompletedTask;
         }
 
         public BasketCheckout MapOrderToBasket(Models.Orders.Order order)
