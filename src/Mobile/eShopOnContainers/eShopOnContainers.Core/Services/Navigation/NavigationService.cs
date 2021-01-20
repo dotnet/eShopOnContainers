@@ -66,7 +66,7 @@ namespace eShopOnContainers.Services
 
             if (mainPage != null)
             {
-                for (int i = 0; i < mainPage.Navigation.NavigationStack.Count - 1; i++)
+                for (int i = mainPage.Navigation.NavigationStack.Count - 2; i >= 0; i--)
                 {
                     var page = mainPage.Navigation.NavigationStack[i];
                     mainPage.Navigation.RemovePage(page);
