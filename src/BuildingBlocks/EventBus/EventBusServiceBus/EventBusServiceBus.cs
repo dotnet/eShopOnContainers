@@ -1,4 +1,6 @@
-﻿namespace Microsoft.eShopOnContainers.BuildingBlocks.EventBusServiceBus
+﻿using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Extensions;
+
+namespace Microsoft.eShopOnContainers.BuildingBlocks.EventBusServiceBus
 {
     using Autofac;
     using Microsoft.Azure.ServiceBus;
@@ -35,7 +37,7 @@
 
         public void Publish(IntegrationEvent @event)
         {
-            var eventName = @event.GetType().Name.Replace(INTEGRATION_EVENT_SUFFIX, "");
+            var eventName = @event.GetEventName().Replace(INTEGRATION_EVENT_SUFFIX, "");
             var jsonMessage = JsonConvert.SerializeObject(@event);
             var body = Encoding.UTF8.GetBytes(jsonMessage);
 
@@ -63,7 +65,7 @@
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = typeof(T).Name.Replace(INTEGRATION_EVENT_SUFFIX, "");
+            var eventName = _subsManager.GetEventKey<T>().Replace(INTEGRATION_EVENT_SUFFIX, "");
 
             var containsKey = _subsManager.HasSubscriptionsForEvent<T>();
             if (!containsKey)
@@ -91,7 +93,7 @@
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = typeof(T).Name.Replace(INTEGRATION_EVENT_SUFFIX, "");
+            var eventName = _subsManager.GetEventKey<T>().Replace(INTEGRATION_EVENT_SUFFIX, "");
 
             try
             {

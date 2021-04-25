@@ -11,14 +11,14 @@ namespace Microsoft.eShopOnContainers.BuildingBlocks.EventBus
 
 
         private readonly Dictionary<string, List<SubscriptionInfo>> _handlers;
-        private readonly List<Type> _eventTypes;
+        private readonly Dictionary<string, Type> _eventTypes;
 
         public event EventHandler<string> OnEventRemoved;
 
         public InMemoryEventBusSubscriptionsManager()
         {
             _handlers = new Dictionary<string, List<SubscriptionInfo>>();
-            _eventTypes = new List<Type>();
+            _eventTypes = new Dictionary<string, Type>();
         }
 
         public bool IsEmpty => !_handlers.Keys.Any();
@@ -38,9 +38,9 @@ namespace Microsoft.eShopOnContainers.BuildingBlocks.EventBus
 
             DoAddSubscription(typeof(TH), eventName, isDynamic: false);
 
-            if (!_eventTypes.Contains(typeof(T)))
+            if (!_eventTypes.ContainsKey(eventName))
             {
-                _eventTypes.Add(typeof(T));
+                _eventTypes.Add(eventName, typeof(T));
             }
         }
 
@@ -94,10 +94,9 @@ namespace Microsoft.eShopOnContainers.BuildingBlocks.EventBus
                 if (!_handlers[eventName].Any())
                 {
                     _handlers.Remove(eventName);
-                    var eventType = _eventTypes.SingleOrDefault(e => e.Name == eventName);
-                    if (eventType != null)
+                    if (_eventTypes.ContainsKey(eventName))
                     {
-                        _eventTypes.Remove(eventType);
+                        _eventTypes.Remove(eventName);
                     }
                     RaiseOnEventRemoved(eventName);
                 }
@@ -152,11 +151,20 @@ namespace Microsoft.eShopOnContainers.BuildingBlocks.EventBus
         }
         public bool HasSubscriptionsForEvent(string eventName) => _handlers.ContainsKey(eventName);
 
-        public Type GetEventTypeByName(string eventName) => _eventTypes.SingleOrDefault(t => t.Name == eventName);
+        public Type GetEventTypeByName(string eventName) => _eventTypes.ContainsKey(eventName) ? _eventTypes[eventName] : default;
 
         public string GetEventKey<T>()
         {
-            return typeof(T).Name;
+            var type = typeof(T);
+            var attributes = type.GetCustomAttributes(false);
+            foreach (var attr in attributes)
+            {
+                //if class contains IntegrationEventNameAttribute take event name from attribute
+                if (attr is IntegrationEventNameAttribute eventInfoAttribute)
+                    return eventInfoAttribute.EventName;
+            }
+
+            return type.Name; //otherwise event name is class name
         }
     }
 }
