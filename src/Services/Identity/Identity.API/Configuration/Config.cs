@@ -20,6 +20,21 @@ namespace Microsoft.eShopOnContainers.Services.Identity.API.Configuration
             };
         }
 
+        // ApiScope is used to protect the API 
+        //The effect is the same as that of API resources in IdentityServer 3.x
+        public static IEnumerable<ApiScope> GetApiScopes()
+        {
+            return new List<ApiScope>
+            {
+                new ApiScope("orders", "Orders Service"),
+                new ApiScope("basket", "Basket Service"),
+                new ApiScope("mobileshoppingagg", "Mobile Shopping Aggregator"),
+                new ApiScope("webshoppingagg", "Web Shopping Aggregator"),
+                new ApiScope("orders.signalrhub", "Ordering Signalr Hub"),
+                new ApiScope("webhooks", "Webhooks registration Service"),
+            };
+        }
+
         // Identity resources are data like user ID, name, or email address of a user
         // see: http://docs.identityserver.io/en/release/configuration/resources.html
         public static IEnumerable<IdentityResource> GetResources()
@@ -101,6 +116,7 @@ namespace Microsoft.eShopOnContainers.Services.Identity.API.Configuration
                     RequireConsent = false,
                     AllowOfflineAccess = true,
                     AlwaysIncludeUserClaimsInIdToken = true,
+                    RequirePkce = false,
                     RedirectUris = new List<string>
                     {
                         $"{clientsUrl["Mvc"]}/signin-oidc"
