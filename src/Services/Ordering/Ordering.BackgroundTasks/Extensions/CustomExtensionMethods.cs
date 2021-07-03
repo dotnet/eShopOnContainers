@@ -104,7 +104,7 @@ namespace Ordering.BackgroundTasks.Extensions
                 services.AddSingleton<IEventBus, EventBusRabbitMQ>(sp =>
                 {
                     var rabbitMQPersistentConnection = sp.GetRequiredService<IRabbitMQPersistentConnection>();
-                    var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
+                    var serviceScopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
                     var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQ>>();
                     var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
 
@@ -115,7 +115,12 @@ namespace Ordering.BackgroundTasks.Extensions
                         retryCount = int.Parse(configuration["EventBusRetryCount"]);
                     }
 
-                    return new EventBusRabbitMQ(rabbitMQPersistentConnection, logger, iLifetimeScope, eventBusSubcriptionsManager, subscriptionClientName, retryCount);
+                    return new EventBusRabbitMQ(rabbitMQPersistentConnection,
+                        logger,
+                        serviceScopeFactory,
+                        eventBusSubcriptionsManager,
+                        subscriptionClientName,
+                        retryCount);
                 });
             }
 
