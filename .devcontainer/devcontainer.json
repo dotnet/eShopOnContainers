@@ -1,0 +1,58 @@
+//////
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.134.1/containers/docker-from-docker-compose
+{
+	"name": "Docker from Docker Compose + Kubernetes & Helm",
+	"dockerFile": "Dockerfile",
+
+	//"service": "docker-from-docker",
+	"workspaceFolder": "/workspace",
+
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
+		"SYNC_LOCALHOST_KUBECONFIG": "true"
+	},
+
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind",
+		"source=${env:HOME}${env:USERPROFILE}/.kube,target=/usr/local/share/kube-localhost,type=bind"
+		// Uncomment the next line to also sync certs in your .minikube folder
+		// "source=${env:HOME}${env:USERPROFILE}/.minikube,target=/usr/local/share/minikube-localhost,type=bind"
+	],
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": { 
+		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-azuretools.vscode-docker",
+		"ms-dotnettools.csharp",
+		"github.github-vscode-theme",
+		"coenraads.bracket-pair-colorizer-2",
+		"github.vscode-pull-request-github",
+		"ms-azuretools.vscode-docker",
+		"ms-vsliveshare.vsliveshare",
+		"vscode-icons-team.vscode-icons",
+		"visualstudioexptteam.vscodeintellicode",
+		"ms-azuretools.vscode-docker",
+		"ms-kubernetes-tools.vscode-kubernetes-tools",
+		"ms-mssql.mssql",
+		"formulahendry.dotnet-test-explorer"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x  minikube-linux-amd64 && sudo mv minikube-linux-amd64 /usr/local/bin/minikube && minikube version"
+
+	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust.
+	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+
+	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+	// "overrideCommand": false,
+	//"remoteUser": "vscode"
+}
