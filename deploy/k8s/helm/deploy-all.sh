@@ -160,7 +160,7 @@ ingress_values_file="ingress_values.yaml"
 
 if [[ $use_local_k8s ]]; then
   ingress_values_file="ingress_values_dockerk8s.yaml"
-  dns="localhost"
+  dns="host.docker.internal"
 fi
 
 if [[ $dns == "aks" ]]; then
@@ -201,7 +201,7 @@ if [[ $clean ]]; then
   if [[ -z $(helm ls -q --namespace $namespace) ]]; then
     echo "No previous releases found"
   else
-    helm uninstall $(helm ls -q --namespace $namespace)
+    helm uninstall $(helm ls -q --namespace $namespace) --namespace $namespace
     echo "Previous releases deleted"
     waitsecs=10; while [ $waitsecs -gt 0 ]; do echo -ne "$waitsecs\033[0K\r"; sleep 1; : $((waitsecs--)); done
   fi
@@ -209,7 +209,8 @@ fi
 
 echo "#################### Begin $app_name installation using Helm ####################"
 infras=(sql-data nosql-data rabbitmq keystore-data basket-data)
-charts=(eshop-common apigwms apigwws basket-api catalog-api identity-api mobileshoppingagg ordering-api ordering-backgroundtasks ordering-signalrhub payment-api webmvc webshoppingagg webspa webstatus webhooks-api webhooks-web)
+charts=(eshop-common basket-api catalog-api identity-api mobileshoppingagg ordering-api ordering-backgroundtasks ordering-signalrhub payment-api webmvc webshoppingagg webspa webstatus webhooks-api webhooks-web)
+apis=(apigwms apigwws)
 
 if [[ !$skip_infrastructure ]]; then
   for infra in "${infras[@]}"
@@ -219,14 +220,24 @@ if [[ !$skip_infrastructure ]]; then
   done  
 fi
 
+for api in "${apis[@]}"
+do
+  echo "Installing: $api"
+  if [[ $use_custom_registry ]]; then 
+    helm install "$app_name-$api" --namespace $namespace --set "ingress.hosts={$dns}" --set inf.registry.server=$container_registry --set inf.registry.login=$docker_username --set inf.registry.pwd=$docker_password --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values $ingress_values_file --set app.name=$app_name --set inf.k8s.dns=$dns --set image.tag=$image_tag --set image.pullPolicy=Always $api 
+  else
+    helm install "$app_name-$api" --namespace $namespace --set "ingress.hosts={$dns}" --values app.yaml --values inf.yaml --values $ingress_values_file --set app.name=$app_name --set inf.k8s.dns=$dns $api 
+  fi
+done
+
 for chart in "${charts[@]}"
 do
-    echo "Installing: $chart"
-    if [[ $use_custom_registry ]]; then 
-      helm install "$app_name-$chart" --namespace $namespace --set "ingress.hosts={$dns}" --set inf.registry.server=$container_registry --set inf.registry.login=$docker_username --set inf.registry.pwd=$docker_password --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values $ingress_values_file --set app.name=$app_name --set inf.k8s.dns=$dns --set image.tag=$image_tag --set image.pullPolicy=Always $chart 
-    elif [[ $chart != "eshop-common" ]]; then  # eshop-common is ignored when no secret must be deployed
-      helm install "$app_name-$chart" --namespace $namespace --set "ingress.hosts={$dns}" --values app.yaml --values inf.yaml --values $ingress_values_file --set app.name=$app_name --set inf.k8s.dns=$dns --set image.tag=$image_tag --set image.pullPolicy=Always $chart 
-    fi
+  echo "Installing: $chart"
+  if [[ $use_custom_registry ]]; then 
+    helm install "$app_name-$chart" --namespace $namespace --set "ingress.hosts={$dns}" --set inf.registry.server=$container_registry --set inf.registry.login=$docker_username --set inf.registry.pwd=$docker_password --set inf.registry.secretName=eshop-docker-scret --values app.yaml --values inf.yaml --values $ingress_values_file --set app.name=$app_name --set inf.k8s.dns=$dns --set image.tag=$image_tag --set image.pullPolicy=Always $chart 
+  elif [[ $chart != "eshop-common" ]]; then  # eshop-common is ignored when no secret must be deployed
+    helm install "$app_name-$chart" --namespace $namespace --set "ingress.hosts={$dns}" --values app.yaml --values inf.yaml --values $ingress_values_file --set app.name=$app_name --set inf.k8s.dns=$dns --set image.tag=$image_tag --set image.pullPolicy=Always $chart 
+  fi
 done
 
 echo "FINISHED: Helm charts installed."

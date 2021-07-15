@@ -61,7 +61,7 @@ $ingressValuesFile="ingress_values.yaml"
 
 if ($useLocalk8s -eq $true) {
     $ingressValuesFile="ingress_values_dockerk8s.yaml"
-    $dns="localhost"
+    $dns="host.docker.internal"
 }
 
 if ($externalDns -eq "aks") {
