@@ -42,7 +42,7 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.O
 
         public string GetPictureUri() => _pictureUrl;
 
-        public decimal GetCurrentDiscount()
+        public decimal GetDiscount()
         {
             return _discount;
         }

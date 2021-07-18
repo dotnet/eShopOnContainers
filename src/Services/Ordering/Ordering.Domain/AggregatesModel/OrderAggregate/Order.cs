@@ -27,7 +27,6 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.O
         private string _description;
 
 
-
         // Draft orders have this set to true. Currently we don't check anywhere the draft status of an Order, but we could do it if needed
         private bool _isDraft;
 
@@ -40,21 +39,27 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.O
 
         private int? _paymentMethodId;
 
-        public static Order NewDraft()
+        public static Order NewDraft(List<OrderItem> orderItems)
         {
-            var order = new Order();
+            var order = new Order(orderItems);
             order._isDraft = true;
             return order;
         }
 
-        protected Order()
+        protected Order(List<OrderItem> orderItems)
         {
             _orderItems = new List<OrderItem>();
+
+            foreach (var item in orderItems)
+            {
+                AddOrderItem(item);
+            }
+
             _isDraft = false;
         }
 
         public Order(string userId, string userName, Address address, int cardTypeId, string cardNumber, string cardSecurityNumber,
-                string cardHolderName, DateTime cardExpiration, int? buyerId = null, int? paymentMethodId = null) : this()
+                string cardHolderName, DateTime cardExpiration, List<OrderItem> orderItems, int? buyerId = null, int? paymentMethodId = null) : this(orderItems)
         {
             _buyerId = buyerId;
             _paymentMethodId = paymentMethodId;
@@ -72,27 +77,27 @@ namespace Microsoft.eShopOnContainers.Services.Ordering.Domain.AggregatesModel.O
         // This Order AggregateRoot's method "AddOrderitem()" should be the only way to add Items to the Order,
         // so any behavior (discounts, etc.) and validations are controlled by the AggregateRoot 
         // in order to maintain consistency between the whole Aggregate. 
-        public void AddOrderItem(int productId, string productName, decimal unitPrice, decimal discount, string pictureUrl, int units = 1)
+        private void AddOrderItem(OrderItem orderItem)
         {
-            var existingOrderForProduct = _orderItems.Where(o => o.ProductId == productId)
-                .SingleOrDefault();
+            var existingOrderForProduct = _orderItems
+                .SingleOrDefault(o => o.ProductId == orderItem.ProductId);
 
             if (existingOrderForProduct != null)
             {
                 //if previous line exist modify it with higher discount  and units..
 
-                if (discount > existingOrderForProduct.GetCurrentDiscount())
+                var discount = orderItem.GetDiscount();
+                if (discount > existingOrderForProduct.GetDiscount())
                 {
                     existingOrderForProduct.SetNewDiscount(discount);
                 }
 
-                existingOrderForProduct.AddUnits(units);
+                existingOrderForProduct.AddUnits(orderItem.GetUnits());
             }
             else
             {
                 //add validated new order item
 
-                var orderItem = new OrderItem(productId, productName, unitPrice, discount, pictureUrl, units);
                 _orderItems.Add(orderItem);
             }
         }

@@ -28,13 +28,10 @@
 
         public Task<OrderDraftDTO> Handle(CreateOrderDraftCommand message, CancellationToken cancellationToken)
         {
+            var orderItems = message.Items.Select(i => i.ToOrderItemDTO())
+                .Select(item => new OrderItem(item.ProductId, item.ProductName, item.UnitPrice, item.Discount, item.PictureUrl, item.Units));
 
-            var order = Order.NewDraft();
-            var orderItems = message.Items.Select(i => i.ToOrderItemDTO());
-            foreach (var item in orderItems)
-            {
-                order.AddOrderItem(item.ProductId, item.ProductName, item.UnitPrice, item.Discount, item.PictureUrl, item.Units);
-            }
+            var order = Order.NewDraft(orderItems.ToList());
 
             return Task.FromResult(OrderDraftDTO.FromOrder(order));
         }
@@ -52,7 +49,7 @@
             {
                 OrderItems = order.OrderItems.Select(oi => new OrderItemDTO
                 {
-                    Discount = oi.GetCurrentDiscount(),
+                    Discount = oi.GetDiscount(),
                     ProductId = oi.ProductId,
                     UnitPrice = oi.GetUnitPrice(),
                     PictureUrl = oi.GetPictureUri(),
@@ -62,10 +59,5 @@
                 Total = order.GetTotal()
             };
         }
-
     }
-
-
-
-
 }

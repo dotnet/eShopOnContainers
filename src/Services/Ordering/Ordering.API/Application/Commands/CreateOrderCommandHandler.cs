@@ -1,4 +1,6 @@
-﻿namespace Microsoft.eShopOnContainers.Services.Ordering.API.Application.Commands
+﻿using System.Linq;
+
+namespace Microsoft.eShopOnContainers.Services.Ordering.API.Application.Commands
 {
     using Domain.AggregatesModel.OrderAggregate;
     using global::Ordering.API.Application.IntegrationEvents;
@@ -46,12 +48,19 @@
             // methods and constructor so validations, invariants and business logic 
             // make sure that consistency is preserved across the whole aggregate
             var address = new Address(message.Street, message.City, message.State, message.Country, message.ZipCode);
-            var order = new Order(message.UserId, message.UserName, address, message.CardTypeId, message.CardNumber, message.CardSecurityNumber, message.CardHolderName, message.CardExpiration);
+            var orderItems = message.OrderItems.Select(item => new OrderItem(item.ProductId, item.ProductName,
+                item.UnitPrice, item.Discount, item.PictureUrl, item.Units));
 
-            foreach (var item in message.OrderItems)
-            {
-                order.AddOrderItem(item.ProductId, item.ProductName, item.UnitPrice, item.Discount, item.PictureUrl, item.Units);
-            }
+            var order = new Order(
+                message.UserId,
+                message.UserName,
+                address,
+                message.CardTypeId,
+                message.CardNumber,
+                message.CardSecurityNumber,
+                message.CardHolderName,
+                message.CardExpiration,
+                orderItems.ToList());
 
             _logger.LogInformation("----- Creating Order - Order: {@Order}", order);
 
