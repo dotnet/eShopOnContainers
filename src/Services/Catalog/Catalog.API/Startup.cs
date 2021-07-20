@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Azure.Messaging.ServiceBus;
 using Catalog.API.Grpc;
 using global::Catalog.API.Infrastructure.Filters;
 using global::Catalog.API.IntegrationEvents;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Abstractions;
@@ -281,10 +281,9 @@ namespace Microsoft.eShopOnContainers.Services.Catalog.API
                 services.AddSingleton<IServiceBusPersisterConnection>(sp =>
                 {
                     var settings = sp.GetRequiredService<IOptions<CatalogSettings>>().Value;
-                    var serviceBusConnection = new ServiceBusConnectionStringBuilder(settings.EventBusConnection);
-                    var subscriptionClientName = configuration["SubscriptionClientName"];
+                    var serviceBusConnection = settings.EventBusConnection;
 
-                    return new DefaultServiceBusPersisterConnection(serviceBusConnection, subscriptionClientName);
+                    return new DefaultServiceBusPersisterConnection(serviceBusConnection);
                 });
             }
             else
@@ -333,9 +332,12 @@ namespace Microsoft.eShopOnContainers.Services.Catalog.API
                     var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
                     var logger = sp.GetRequiredService<ILogger<EventBusServiceBus>>();
                     var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
+                    var serviceBusConnectionString = configuration["EventBusConnection"];
+                    string topicName = ServiceBusConnectionStringProperties.Parse(serviceBusConnectionString).EntityPath;
+                    string subscriptionName = configuration["SubscriptionClientName"];
 
                     return new EventBusServiceBus(serviceBusPersisterConnection, logger,
-                        eventBusSubcriptionsManager, iLifetimeScope);
+                        eventBusSubcriptionsManager, iLifetimeScope, topicName, subscriptionName);
                 });
 
             }

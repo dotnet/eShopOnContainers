@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.1.0" />
-    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="5.1.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.1.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
   </ItemGroup>

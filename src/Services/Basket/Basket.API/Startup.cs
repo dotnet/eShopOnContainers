@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Azure.Messaging.ServiceBus;
 using Basket.API.Infrastructure.Filters;
 using Basket.API.IntegrationEvents.EventHandling;
 using Basket.API.IntegrationEvents.Events;
@@ -10,7 +11,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Abstractions;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ;
@@ -122,10 +122,8 @@ namespace Microsoft.eShopOnContainers.Services.Basket.API
                 services.AddSingleton<IServiceBusPersisterConnection>(sp =>
                 {
                     var serviceBusConnectionString = Configuration["EventBusConnection"];
-                    var serviceBusConnection = new ServiceBusConnectionStringBuilder(serviceBusConnectionString);
 
-                    var subscriptionClientName = Configuration["SubscriptionClientName"];
-                    return new DefaultServiceBusPersisterConnection(serviceBusConnection, subscriptionClientName);
+                    return new DefaultServiceBusPersisterConnection(serviceBusConnectionString);
                 });
             }
             else
@@ -285,9 +283,12 @@ namespace Microsoft.eShopOnContainers.Services.Basket.API
                     var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
                     var logger = sp.GetRequiredService<ILogger<EventBusServiceBus>>();
                     var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
+                    var serviceBusConnectionString = Configuration["EventBusConnection"];
+                    string topicName = ServiceBusConnectionStringProperties.Parse(serviceBusConnectionString).EntityPath;
+                    string subscriptionName = Configuration["SubscriptionClientName"];
 
                     return new EventBusServiceBus(serviceBusPersisterConnection, logger,
-                        eventBusSubcriptionsManager, iLifetimeScope);
+                        eventBusSubcriptionsManager, iLifetimeScope, topicName, subscriptionName);
                 });
             }
             else

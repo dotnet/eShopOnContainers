@@ -1,12 +1,12 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Azure.Messaging.ServiceBus;
 using Devspaces.Support;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
 using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Abstractions;
@@ -215,9 +215,12 @@ namespace Webhooks.API
                     var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
                     var logger = sp.GetRequiredService<ILogger<EventBusServiceBus>>();
                     var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
+                    var serviceBusConnectionString = configuration["EventBusConnection"];
+                    string topicName = ServiceBusConnectionStringProperties.Parse(serviceBusConnectionString).EntityPath;
+                    string subscriptionName = configuration["SubscriptionClientName"];
 
                     return new EventBusServiceBus(serviceBusPersisterConnection, logger,
-                        eventBusSubcriptionsManager, iLifetimeScope);
+                        eventBusSubcriptionsManager, iLifetimeScope, topicName, subscriptionName);
                 });
 
             }
@@ -285,9 +288,8 @@ namespace Webhooks.API
             {
                 services.AddSingleton<IServiceBusPersisterConnection>(sp =>
                 {
-                    var serviceBusConnection = new ServiceBusConnectionStringBuilder(configuration["EventBusConnection"]);
                     var subscriptionClientName = configuration["SubscriptionClientName"];
-                    return new DefaultServiceBusPersisterConnection(serviceBusConnection, subscriptionClientName);
+                    return new DefaultServiceBusPersisterConnection(configuration["EventBusConnection"]);
                 });
             }
             else

@@ -1,43 +1,44 @@
-﻿namespace Microsoft.eShopOnContainers.Services.Ordering.API
-{
-    using AspNetCore.Http;
-    using Autofac;
-    using Autofac.Extensions.DependencyInjection;
-    using global::Ordering.API.Application.IntegrationEvents;
-    using global::Ordering.API.Application.IntegrationEvents.Events;
-    using global::Ordering.API.Infrastructure.Filters;
-    using GrpcOrdering;
-    using HealthChecks.UI.Client;
-    using Infrastructure.AutofacModules;
-    using Infrastructure.Filters;
-    using Infrastructure.Services;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Azure.ServiceBus;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
-    using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Abstractions;
-    using Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ;
-    using Microsoft.eShopOnContainers.BuildingBlocks.EventBusServiceBus;
-    using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF;
-    using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF.Services;
-    using Microsoft.eShopOnContainers.Services.Ordering.API.Controllers;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Diagnostics.HealthChecks;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.OpenApi.Models;
-    using Ordering.Infrastructure;
-    using RabbitMQ.Client;
-    using System;
-    using System.Collections.Generic;
-    using System.Data.Common;
-    using System.IdentityModel.Tokens.Jwt;
-    using System.IO;
-    using System.Reflection;
+﻿using Microsoft.AspNetCore.Http;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Azure.Messaging.ServiceBus;
+using global::Ordering.API.Application.IntegrationEvents;
+using global::Ordering.API.Application.IntegrationEvents.Events;
+using global::Ordering.API.Infrastructure.Filters;
+using GrpcOrdering;
+using HealthChecks.UI.Client;
+using Microsoft.eShopOnContainers.Services.Ordering.API.Infrastructure.AutofacModules;
+using Microsoft.eShopOnContainers.Services.Ordering.API.Infrastructure.Filters;
+using Microsoft.eShopOnContainers.Services.Ordering.API.Infrastructure.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
+using Microsoft.eShopOnContainers.BuildingBlocks.EventBus.Abstractions;
+using Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ;
+using Microsoft.eShopOnContainers.BuildingBlocks.EventBusServiceBus;
+using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF;
+using Microsoft.eShopOnContainers.BuildingBlocks.IntegrationEventLogEF.Services;
+using Microsoft.eShopOnContainers.Services.Ordering.API.Controllers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using Ordering.Infrastructure;
+using RabbitMQ.Client;
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.IdentityModel.Tokens.Jwt;
+using System.IO;
+using System.Reflection;
+using Microsoft.eShopOnContainers.Services.Ordering.Infrastructure;
 
+namespace Microsoft.eShopOnContainers.Services.Ordering.API
+{
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -297,10 +298,10 @@
                 services.AddSingleton<IServiceBusPersisterConnection>(sp =>
                 {
                     var serviceBusConnectionString = configuration["EventBusConnection"];
-                    var serviceBusConnection = new ServiceBusConnectionStringBuilder(serviceBusConnectionString);
+
                     var subscriptionClientName = configuration["SubscriptionClientName"];
 
-                    return new DefaultServiceBusPersisterConnection(serviceBusConnection, subscriptionClientName);
+                    return new DefaultServiceBusPersisterConnection(serviceBusConnectionString);
                 });
             }
             else
@@ -374,9 +375,12 @@
                     var iLifetimeScope = sp.GetRequiredService<ILifetimeScope>();
                     var logger = sp.GetRequiredService<ILogger<EventBusServiceBus>>();
                     var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
+                    var serviceBusConnectionString = configuration["EventBusConnection"];
+                    string topicName = ServiceBusConnectionStringProperties.Parse(serviceBusConnectionString).EntityPath;
+                    string subscriptionName = configuration["SubscriptionClientName"];
 
                     return new EventBusServiceBus(serviceBusPersisterConnection, logger,
-                        eventBusSubcriptionsManager, iLifetimeScope);
+                        eventBusSubcriptionsManager, iLifetimeScope, topicName, subscriptionName);
                 });
             }
             else
