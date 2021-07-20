@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -11,14 +11,17 @@ metadata:
   namespace: default
 spec:
   rules:
-  - http: 
+    http:
       paths:
-      - backend:
-          serviceName: webmvc
-          servicePort: http
-        path: /webmvc
+      - path: /webmvc
+        pathType: Prefix
+        backend:
+          service: 
+            name: webmvc
+            port: 
+              number: 80  
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -31,9 +34,12 @@ metadata:
   namespace: default
 spec:
   rules:
-  - http:
+    http:
       paths:
-      - backend:
-          serviceName: identity
-          servicePort: http
-        path: /identity
+      - path: /identity
+        pathType: Prefix
+        backend:
+          service: 
+            name: identity
+            port: 
+              number: 80

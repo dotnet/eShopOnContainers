@@ -1,2 +1,0 @@
-eShop API Gateway for Mobile Shopping services installed
---------------------------------------------------------

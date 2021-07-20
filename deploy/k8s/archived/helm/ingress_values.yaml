@@ -1,8 +1,0 @@
-# This file contains common ingress annotations when using AKS with Http Application Routing
-
-ingress:
-  annotations:
-    kubernetes.io/ingress.class: addon-http-application-routing
-    ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-

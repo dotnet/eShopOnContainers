@@ -1,7 +1,0 @@
-Common eShop resources installed:
-
-{{- if .Values.inf.registry -}}
-* Docker registry secret ({{ .Values.inf.registry.secretName }})
-{{- end -}}
-
-+++ Done +++

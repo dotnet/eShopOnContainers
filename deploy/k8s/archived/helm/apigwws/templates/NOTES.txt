@@ -1,2 +1,0 @@
-eShop API Gateway for Web Shopping services installed
------------------------------------------------------

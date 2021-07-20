@@ -1,7 +1,0 @@
-# This file contains common ingress annotations when using Kubernetes included in Docker Desktop
-
-ingress:
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"

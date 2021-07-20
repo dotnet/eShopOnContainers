@@ -1,8 +1,0 @@
-applicationName: eshop
-issuerName: letsencrypt-prod
-certName: eshop-cert-prod
-environment: prod
-server: https://acme-v02.api.letsencrypt.org/directory
-certSecretName: eshop-letsencrypt-prod
-issuerSecretName: letsencrypt-prod
-ingressClass: addon-http-application-routing

@@ -3,7 +3,7 @@
 {{- $ingressPath := include "pathBase" . -}}
 {{- $serviceName := .Values.app.svc.identity }}
 {{- $name := include "identity-api.fullname" . -}} 
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $name }}-local
@@ -25,9 +25,12 @@ spec:
   rules:
   - http:
       paths:
-      - backend:
-          serviceName: {{ $serviceName }}
-          servicePort: http
-        path: {{ $ingressPath }}
+      - path: {{ $ingressPath }}
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ $serviceName }}
+            port:
+              number: 80
 {{- end -}}
 {{- end -}}

@@ -1,7 +1,7 @@
 {{- if .Values.ingress.enabled -}}
 {{- $ingressPath := include "pathBase" . -}}
 {{- $serviceName := .Values.app.svc.identity }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "identity-api.fullname" . }}
@@ -39,8 +39,11 @@ spec:
       http:
         paths:
           - path: {{ $ingressPath }}
+            pathType: Prefix
             backend:
-              serviceName: {{ $serviceName }}
-              servicePort: http
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: 80
   {{- end }}
 {{- end }}
