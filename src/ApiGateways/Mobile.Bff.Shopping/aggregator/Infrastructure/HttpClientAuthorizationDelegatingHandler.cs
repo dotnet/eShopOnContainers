@@ -11,12 +11,12 @@ namespace Microsoft.eShopOnContainers.Mobile.Shopping.HttpAggregator.Infrastruct
 {
     public class HttpClientAuthorizationDelegatingHandler : DelegatingHandler
     {
-        private readonly IHttpContextAccessor _httpContextAccesor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<HttpClientAuthorizationDelegatingHandler> _logger;
 
-        public HttpClientAuthorizationDelegatingHandler(IHttpContextAccessor httpContextAccesor, ILogger<HttpClientAuthorizationDelegatingHandler> logger)
+        public HttpClientAuthorizationDelegatingHandler(IHttpContextAccessor httpContextAccessor, ILogger<HttpClientAuthorizationDelegatingHandler> logger)
         {
-            _httpContextAccesor = httpContextAccesor;
+            _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
 
@@ -25,7 +25,7 @@ namespace Microsoft.eShopOnContainers.Mobile.Shopping.HttpAggregator.Infrastruct
             request.Version = new System.Version(2, 0);
             request.Method = HttpMethod.Get;
 
-            var authorizationHeader = _httpContextAccesor.HttpContext
+            var authorizationHeader = _httpContextAccessor.HttpContext
                 .Request.Headers["Authorization"];
 
             if (!string.IsNullOrEmpty(authorizationHeader))
@@ -47,7 +47,7 @@ namespace Microsoft.eShopOnContainers.Mobile.Shopping.HttpAggregator.Infrastruct
         {
             const string ACCESS_TOKEN = "access_token";
 
-            return await _httpContextAccesor.HttpContext
+            return await _httpContextAccessor.HttpContext
                 .GetTokenAsync(ACCESS_TOKEN);
         }
     }
